@@ -112,7 +112,7 @@ class SO100CubeStackJointPosEnvCfg(StackEnvCfg):
             prim_path="{ENV_REGEX_NS}/Cube_1",
             init_state=RigidObjectCfg.InitialStateCfg(pos=[0.2, 0.0, 0.0203], rot=[1, 0, 0, 0]),
             spawn=UsdFileCfg(
-                usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/blue_block.usd",
+                usd_path="source/isaaclab_tasks/isaaclab_tasks/manager_based/manipulation/stack/config/so_100/asset/blocks/blue_block.usd",
                 scale=(0.5, 0.5, 0.5),
                 rigid_props=cube_properties,
                 semantic_tags=[("class", "cube_1")],
@@ -122,7 +122,7 @@ class SO100CubeStackJointPosEnvCfg(StackEnvCfg):
             prim_path="{ENV_REGEX_NS}/Cube_2",
             init_state=RigidObjectCfg.InitialStateCfg(pos=[0.2, 0.05, 0.0203], rot=[1, 0, 0, 0]),
             spawn=UsdFileCfg(
-                usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/red_block.usd",
+                usd_path="source/isaaclab_tasks/isaaclab_tasks/manager_based/manipulation/stack/config/so_100/asset/blocks/red_block.usd",
                 scale=(0.5, 0.5, 0.5),
                 rigid_props=cube_properties,
                 semantic_tags=[("class", "cube_2")],
@@ -132,7 +132,7 @@ class SO100CubeStackJointPosEnvCfg(StackEnvCfg):
             prim_path="{ENV_REGEX_NS}/Cube_3",
             init_state=RigidObjectCfg.InitialStateCfg(pos=[0.3, -0.05, 0.0203], rot=[1, 0, 0, 0]),
             spawn=UsdFileCfg(
-                usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/green_block.usd",
+                usd_path="source/isaaclab_tasks/isaaclab_tasks/manager_based/manipulation/stack/config/so_100/asset/blocks/green_block.usd",
                 scale=(0.5, 0.5, 0.5),
                 rigid_props=cube_properties,
                 semantic_tags=[("class", "cube_3")],

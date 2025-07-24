@@ -267,7 +267,8 @@ class LeRobotDatasetFileHandler(DatasetFileHandlerBase):
         try:
             self._dataset = LeRobotDataset.create(
                 repo_id=repo_id,
-                fps=fps,
+                # fps=fps,
+                fps=30,
                 features=features,
                 root=self._dataset_path,
                 robot_type="isaac_lab_robot",
@@ -466,7 +467,8 @@ class LeRobotDatasetFileHandler(DatasetFileHandlerBase):
                 "shape": self._get_video_shape(tensor),
                 "names": ["channel", "height", "width"],
                 "video_info": {
-                    "video.fps": int(1 / env.step_dt)
+                    # "video.fps": int(1 / env.step_dt)
+                    "video.fps": 30
                 }
             }
         else:

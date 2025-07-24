@@ -374,14 +374,14 @@ def main():
             return device
         elif "handtracking" in device_name:
             # Create Franka retargeter with desired configuration
-            if "_abs" in device_name:
-                retargeter_device = Se3AbsRetargeter(
-                    bound_hand=OpenXRDevice.TrackingTarget.HAND_RIGHT, zero_out_xy_rotation=True
-                )
-            else:
-                retargeter_device = Se3RelRetargeter(
-                    bound_hand=OpenXRDevice.TrackingTarget.HAND_RIGHT, zero_out_xy_rotation=True
-                )
+            # if "_abs" in device_name:
+            #     retargeter_device = Se3AbsRetargeter(
+            #         bound_hand=OpenXRDevice.TrackingTarget.HAND_RIGHT, zero_out_xy_rotation=True
+            #     )
+            # else:
+            retargeter_device = Se3RelRetargeter(
+                bound_hand=OpenXRDevice.TrackingTarget.HAND_RIGHT, zero_out_xy_rotation=False,  delta_pos_scale_factor=40, delta_rot_scale_factor=40
+            )
 
             grip_retargeter = GripperRetargeter(bound_hand=OpenXRDevice.TrackingTarget.HAND_RIGHT)
 

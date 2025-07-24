@@ -162,7 +162,7 @@ def main():
     if use_lerobot_format:
         print(f"Recording dataset in LeRobot format: {args_cli.output_file}")
     else:
-        print(f"Recording dataset in HDF5 format: {args_cli.dataset_file}")
+        print(f"Recording dataset in HDF5 format: {args_cli.output_file}")
 
     if episode_count == 0:
         print("No episodes found in the dataset.")

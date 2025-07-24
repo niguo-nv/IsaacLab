@@ -25,6 +25,10 @@
         "table_cam": {
             "original_key": "observation.table_cam", 
             "description": "External table camera view of workspace"
+        },
+        "wrist_cam": {
+            "original_key": "observation.wrist_cam", 
+            "description": "External table camera view of workspace"
         }
     },
     "annotation": {
@@ -36,12 +40,12 @@
         "robot_type": "SO100",
         "control_mode": "Pink_IK_Absolute",
         "task": "cube_stacking",
-        "cameras": ["table_cam"],
-        "camera_resolution": [512, 512],
+        "cameras": ["table_cam", "wrist_cam"],
+        "camera_resolution": [640, 480],
         "dof": 6,
         "workspace_bounds": {
             "x": [-0.5, 0.5],
-            "y": [-0.5, 0.5], 
+            "y": [-1, 1], 
             "z": [0.0, 0.5]
         }
     }

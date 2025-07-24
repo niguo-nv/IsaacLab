@@ -12,6 +12,7 @@ import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg
 from isaaclab.controllers.pink_ik_cfg import PinkIKControllerCfg
 from isaaclab.envs.mdp.actions.pink_actions_cfg import PinkInverseKinematicsActionCfg
+from isaaclab.envs.mdp.recorders.recorders_cfg import ActionStateRecorderManagerCfg
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import SceneEntityCfg
@@ -48,9 +49,9 @@ class ObservationsCfg:
         table_cam = ObsTerm(
             func=base_mdp.image, params={"sensor_cfg": SceneEntityCfg("table_cam"), "data_type": "rgb", "normalize": False}
         )
-        # wrist_cam = ObsTerm(
-        #     func=base_mdp.image, params={"sensor_cfg": SceneEntityCfg("wrist_cam"), "data_type": "rgb", "normalize": False}
-        # )
+        wrist_cam = ObsTerm(
+            func=base_mdp.image, params={"sensor_cfg": SceneEntityCfg("wrist_cam"), "data_type": "rgb", "normalize": False}
+        )
 
         def __post_init__(self):
             self.enable_corruption = False
@@ -69,6 +70,22 @@ class ObservationsCfg:
                 "object_cfg": SceneEntityCfg("cube_2"),
             },
         )
+        stack_1 = ObsTerm(
+            func=mdp.object_stacked,
+            params={
+                "robot_cfg": SceneEntityCfg("robot"),
+                "upper_object_cfg": SceneEntityCfg("cube_2"),
+                "lower_object_cfg": SceneEntityCfg("cube_1"),
+            },
+        )
+        grasp_2 = ObsTerm(
+            func=mdp.object_grasped,
+            params={
+                "robot_cfg": SceneEntityCfg("robot"),
+                "ee_frame_cfg": SceneEntityCfg("ee_frame"),
+                "object_cfg": SceneEntityCfg("cube_3"),
+            },
+        )
 
         def __post_init__(self):
             self.enable_corruption = False
@@ -85,6 +102,9 @@ class SO100CubeStackPinkIKAbsVisuomotorEnvCfg(stack_joint_pos_env_cfg.SO100CubeS
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
+
+        # Initialize recorders configuration
+        self.recorders = ActionStateRecorderManagerCfg()
 
         # Temporary directory for URDF files
         self.temp_urdf_dir = tempfile.gettempdir()
@@ -155,30 +175,34 @@ class SO100CubeStackPinkIKAbsVisuomotorEnvCfg(stack_joint_pos_env_cfg.SO100CubeS
         self.actions.arm_action.controller.urdf_path = temp_urdf_output_path
         self.actions.arm_action.controller.mesh_path = temp_urdf_meshes_output_path
 
-        # # Set wrist camera
-        # self.scene.wrist_cam = CameraCfg(
-        #     prim_path="{ENV_REGEX_NS}/Robot/gripper/wrist_cam",
-        #     update_period=0.0,
-        #     height=512,
-        #     width=512,
-        #     data_types=["rgb", "distance_to_image_plane"],
-        #     spawn=sim_utils.PinholeCameraCfg(
-        #         focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 2)
-        #     ),
-        #     offset=CameraCfg.OffsetCfg(
-        #         pos=(0.08, 0.0, -0.1), rot=(-0.70614, 0.03701, 0.03701, -0.70614), convention="ros"
-        #     ),
-        # )
-
-        # Set table view camera
-        self.scene.table_cam = CameraCfg(
-            prim_path="{ENV_REGEX_NS}/table_cam",
-            update_period=0.0,
-            height=512,
-            width=512,
+        self.scene.wrist_cam = CameraCfg(
+            prim_path="{ENV_REGEX_NS}/Robot/gripper/wrist_cam",
+            update_period=1.0/30.0,  # 30fps
+            height=480,
+            width=640,
             data_types=["rgb", "distance_to_image_plane"],
             spawn=sim_utils.PinholeCameraCfg(
-                focal_length=24.0, focus_distance=400.0, horizontal_aperture=20.955, clipping_range=(0.1, 2)
+                focal_length=2.8,
+                focus_distance=400.0, 
+                horizontal_aperture=6.4,
+                clipping_range=(0.1, 2)
+            ),
+            offset=CameraCfg.OffsetCfg(
+                pos=(0.13, 0.0, -0.15), rot=(-0.70614, 0.03701, 0.03701, -0.70614), convention="ros"
+            ),
+        )
+
+        self.scene.table_cam = CameraCfg(
+            prim_path="{ENV_REGEX_NS}/table_cam",
+            update_period=1.0/30.0,  # 30fps
+            height=480,
+            width=640,
+            data_types=["rgb", "distance_to_image_plane"],
+            spawn=sim_utils.PinholeCameraCfg(
+                focal_length=24,
+                focus_distance=400.0, 
+                horizontal_aperture=6.4,
+                clipping_range=(0.1, 2)
             ),
             offset=CameraCfg.OffsetCfg(
                 pos=(1.0, 0.0, 0.4), rot=(0.35355, -0.61237, -0.61237, 0.35355), convention="ros"
@@ -190,17 +214,18 @@ class SO100CubeStackPinkIKAbsVisuomotorEnvCfg(stack_joint_pos_env_cfg.SO100CubeS
         self.sim.render.antialiasing_mode = "OFF"  # disable dlss
 
         # List of image observations in policy observations
-        self.image_obs_list = ["table_cam"]
-        # self.image_obs_list = ["table_cam", "wrist_cam"]
+        # self.image_obs_list = ["table_cam"]
+        self.image_obs_list = ["table_cam", "wrist_cam"]
         
         # Configure LeRobot dataset recording in recorder manager
         self.recorders.observation_keys_to_record = [
-            ("policy", "table_cam")
+            ("policy", "table_cam"),
+            ("policy", "wrist_cam")
         ]
         # State observations that should be combined into "observation.state"
         self.recorders.state_observation_keys = [
             ("policy", "joint_pos") 
         ]
         # Task description for the dataset
-        self.recorders.task_description = "Stack the red cube on top of the blue cube"
+        self.recorders.task_description = "Stack the cubes from left to right."
         
